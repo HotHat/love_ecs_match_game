@@ -17,6 +17,18 @@ function world:add(entity)
     table.insert(self.entity, entity)
 end
 
+function world:load()
+    for i, sys in ipairs(self.system) do
+        for i = 1, #self.entity do
+            if (sys:match(self.entity[i])) then
+                sys:load(self.entity[i])
+            end
+        end
+    end
+
+end
+
+
 function world:update(dt)
     for i, sys in ipairs(self.system) do
         for i = 1, #self.entity do
