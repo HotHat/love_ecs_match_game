@@ -6,8 +6,8 @@ local World = require("world")
 local world  = World.new()
 
 local Input = { horizontal = 0, vertical = 0}
-local PhysicsWorld = love.physics.newWorld(0, 9.81) 
-local Speed = 10
+local PhysicsWorld = love.physics.newWorld(0, 0) 
+local Speed = 100
 
 local sys = System.new{"Position", "Rect"}
 function sys:update(dt, entity)
@@ -21,8 +21,14 @@ end
 function sys:draw(entity)
     local pos = entity:get("Position")
     local rect = entity:get("Rect")
+    local physics = entity:get("Physics")
 
-    love.graphics.rectangle("fill", pos.x, pos.y, rect.width, rect.height)
+    if (physics ~= nil) then
+        love.graphics.setColor(1, 0, 0) -- set the drawing color to green for the ground
+        love.graphics.polygon("fill", physics.body:getWorldPoints(physics.shape:getPoints())) 
+    else
+        love.graphics.rectangle("fill", pos.x, pos.y, rect.width, rect.height)
+    end
 end
 
 local physics = System.new{"Physics", "Rect", "Position"}
@@ -56,15 +62,16 @@ function love.load()
           if (Input.horizontal ~= 0) then 
             print(Input.horizontal, Input.vertical)
             print(physics.body)
-            physics.body:applyForce(Input.horizontal * Speed , 0)
+            physics.body:setLinearVelocity(Input.horizontal * Speed , 0)
           else  
-            physics.body:setLinearVelocity(0, 0)
+            physics.body:applyForce(0, 0)
           end
 
           if (Input.vertical ~= 0) then
             physics.body:setLinearVelocity(0, Input.vertical * Speed)
           else 
-            physics.body:setLinearVelocity(0, 0)
+            physics.body:applyForce(0, 0)
+            --physics.body:setLinearVelocity(0, 4000)
           end
     end}
 
